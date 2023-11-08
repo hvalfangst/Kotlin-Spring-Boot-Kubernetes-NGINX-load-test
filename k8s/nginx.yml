@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kotlin-spring-boot-with-nginx
+  template:
+    metadata:
+      labels:
+        app: kotlin-spring-boot-with-nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: nginx-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+data:
+  nginx.conf: |-
+    worker_processes auto;
+    events {
+      worker_connections 1024;
+    }
+    http {
+      upstream kotlin-spring-boot-with-nginx-service {
+        server kotlin-spring-boot-with-nginx-service:8081; 
+      }
+      server {
+        listen 80;
+        location / {
+          proxy_pass http://kotlin-spring-boot-with-nginx-service;
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        }
+      }
+    }

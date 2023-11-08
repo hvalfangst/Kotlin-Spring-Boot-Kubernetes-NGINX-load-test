@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kotlin-spring-boot-without-nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kotlin-spring-boot-without-nginx
+  template:
+    metadata:
+      labels:
+        app: kotlin-spring-boot-without-nginx
+    spec:
+      containers:
+        - name: kotlin-spring-boot-without-nginx-container
+          image: hardokkerdokker/hvalfangst:kotlin-spring-boot-with-exposed
+          ports:
+            - containerPort: 8080
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kotlin-spring-boot-without-nginx-service
+spec:
+  selector:
+    app: kotlin-spring-boot-without-nginx
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: LoadBalancer
