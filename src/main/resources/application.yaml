@@ -1,0 +1,6 @@
+server:
+  port: 8080
+db:
+  url: jdbc:postgresql://postgres-service:5432/cars_db?user=MP77&password=IDecreeAndDeclareWarOnShitePerformance
+
+
